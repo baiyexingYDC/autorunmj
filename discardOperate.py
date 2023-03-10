@@ -13,41 +13,24 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from CaptchaResolver import CaptchaResolver
 from imgOperate import resize_base64_image
-import undetected_chromedriver as uc
 
 class Solution(object):
-    def __init__(self, url):
+    def __init__(self, url=""):
         options = webdriver.EdgeOptions()
-        options.add_argument("-inprivate")
-        options.add_argument('--disable-blink-features=AutomationControlled')
+        # options.add_argument("-inprivate")
+        options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
         self.browser = webdriver.Edge(options=options)
-        self.browser.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": """
-              // 修改navigator.webdriver检测
-              Object.defineProperty(navigator, 'webdriver', {
-                get: () => undefined
-              })
-              // 修改window.navigator属性值
-              window.navigator.chrome = {
-                runtime: {},
-                // etc.
-              }
-              // 修改插件信息
-              const originalQuery = window.navigator.permissions.query;
-              window.navigator.permissions.query = (parameters) => (
-                parameters.name === 'notifications' ?
-                  Promise.resolve({ state: Notification.permission }) :
-                  originalQuery(parameters)
-              );
-            """
-        })
-        self.browser.get(url)
+        if len(url) > 0:
+            self.browser.get(url)
         self.wait = WebDriverWait(self.browser, 20)
         self.captcha_resolver = CaptchaResolver()
 
     def __del__(self):
         time.sleep(10)
         self.browser.close()
+
+    def get_title(self):
+        logger.debug(self.browser.title)
 
     def set_user_name(self, n, user_name_pre):
         # 邀请链接

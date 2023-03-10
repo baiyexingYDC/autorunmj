@@ -1,5 +1,6 @@
 import time
 import discardOperate
+import subprocess
 from loguru import logger
 import guiOperate
 
@@ -8,13 +9,21 @@ running = True
 
 # 使用try-except语句来捕获键盘中断异常
 try:
-    # 当running为True时，循环执行函数
+    # 当running为True时，循环执行函数'--inprivate ' \
     while running:
-        # s = discardOperate.Solution("https://democaptcha.com/demo-form-eng/hcaptcha.html")
-        s = discardOperate.Solution("https://discord.gg/KK7bF6KAVt")
-        s.set_user_name(1, "say-boy-")
-        s.trigger_captcha()
-        s.verify_captcha()
+        cmd = '"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" ' \
+              '--remote-debugging-port=9222 ' \
+              '--user-data-dir="C:\selenium\ChromeProfile"'
+        # subprocess.run(cmd)
+        p = subprocess.Popen(cmd)  # 创建一个子进程执行ls -l命令
+        print(p.pid)  # 打印子进程的pid
+        time.sleep(3)
+        s = discardOperate.Solution()
+        # s.get_title()
+        # s = discardOperate.Solution("https://discord.gg/KK7bF6KAVt")
+        # s.set_user_name(10, "say-boy-")
+        # s.trigger_captcha()
+        # s.verify_captcha()
 
         # guiOperate.writeTokenToExcel()
         # 可以在这里添加一些延时或其他操作，例如：
