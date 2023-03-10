@@ -11,14 +11,13 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-from CaptchaResolver import CaptchaResolver
-from imgOperate import resize_base64_image
+from utils.CaptchaResolver import CaptchaResolver
+from utils.imageUtils import resize_base64_image
 
 class Solution(object):
     def __init__(self, url=""):
         options = webdriver.EdgeOptions()
-        # options.add_argument("-inprivate")
-        options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
+        options.add_argument("-inprivate")
         self.browser = webdriver.Edge(options=options)
         if len(url) > 0:
             self.browser.get(url)

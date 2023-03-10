@@ -3,7 +3,7 @@ import time
 import pyautogui
 
 
-def writeTokenToExcel():
+def write_token():
     pyautogui.PAUSE = 1
     pyautogui.FAILSAFE = True
 
