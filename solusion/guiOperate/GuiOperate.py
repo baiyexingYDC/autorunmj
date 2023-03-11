@@ -1,6 +1,7 @@
 import re
 import time
 import random
+from datetime import datetime
 
 import pytesseract
 from loguru import logger
@@ -83,6 +84,7 @@ def get_region(model_path):
         browser = pyautogui.locateOnScreen(model_path, confidence=0.8)  # 使用 locateOnScreen() 函数找到模板图片的位置，并赋值给 r
         if browser is not None:
             return browser
+        retry_count += 1
         if retry_count == 120:
             logger.error(f"模板{model_path}位置获取超时.......")
             raise Exception(f"模板{model_path}点击超时.......")
@@ -130,9 +132,11 @@ def check_verify(hCapcha_retry_time):
     # 判断是否需要再试一次
     while True:  # 当 r 为 None 时，循环执行以下代码
         time.sleep(0.5)
+        logger.debug(f"循环检测第{retry_count}次")
         try_again = pyautogui.locateOnScreen("model/try-again.png", confidence=0.8)
         hCapcha = pyautogui.locateOnScreen("model/hCapcha.png", confidence=0.8)
-        check = pyautogui.locateOnScreen("model/check/phone.png",confidence=0.8)
+        check = pyautogui.locateOnScreen("model/check/phone.png", confidence=0.8)
+        success = pyautogui.locateOnScreen("model/success.png", confidence=0.8)
         if try_again is not None:
             time.sleep(1.5)
             logger.debug(f"挑战重新进行识别......")
@@ -157,10 +161,11 @@ def check_verify(hCapcha_retry_time):
             pyautogui.hotkey("win", "m")
             change_vpn()
             raise VerifyExcept("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
-        retry_count += 1
-        if retry_count == 5:
-            logger.debug(f"验证通过！")
+        elif success is not None:
+            logger.debug("验证通过,生日快乐！")
             break
+        retry_count += 1
+
 
 def change_vpn():
     right_click("model/vpn_node/ico.png")
@@ -203,49 +208,47 @@ def solv_hCapcha(hCapcha_retry_time):
 
 
 def get_token():
-    success = get_region("model/success.png")
-    time.sleep(1)
-    if success:
-        # 输入年月日
-        click("model/check-year.png")
-        pyautogui.write("199" + str(random.randint(1, 9)))
+    # 输入年月日
+    click("model/check-year.png")
+    pyautogui.write("199" + str(random.randint(1, 9)))
 
-        month = get_region("model/check-month.png")
-        click("model/check-month.png")
-        pyautogui.write(str(random.randint(1, 12)))
-        pyautogui.moveTo(month[0] + 80, month[1] - 20, duration=0.1, tween=pyautogui.easeOutQuad)
-        pyautogui.click()
+    month = get_region("model/check-month.png")
+    click("model/check-month.png")
+    pyautogui.write(str(random.randint(1, 12)))
+    pyautogui.moveTo(month[0] + 80, month[1] - 20, duration=0.1, tween=pyautogui.easeOutQuad)
+    pyautogui.click()
 
-        click("model/check-day.png")
-        pyautogui.write(str(random.randint(1, 20)))
-        click("model/check-done.png")
+    click("model/check-day.png")
+    pyautogui.write(str(random.randint(1, 20)))
+    click("model/check-done.png")
 
-        # 关闭认证邮箱
-        success_email = get_region("model/success-email.png")
-        pyautogui.moveTo(success_email[0] - 100, success_email[1])
-        pyautogui.click()
+    # 关闭认证邮箱
+    success_email = get_region("model/success-email.png")
+    pyautogui.moveTo(success_email[0] - 100, success_email[1])
+    pyautogui.click()
 
-        # 输入prompt 并接受协议
-        click("model/channal-message.png")
-        pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
-        click("model/tab-prompt.png")
-        pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
-        pyautogui.press("enter")
-        click("model/channal-accept toS.png")
+    # 输入prompt 并接受协议
+    click("model/channal-message.png")
+    pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
+    click("model/tab-prompt.png")
+    pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
+    pyautogui.press("enter")
+    click("model/channal-accept toS.png")
 
-        # 从控制台获取token
-        pyautogui.press('f12')
-        click("model/application.png")
-        click("model/filter.png")
-        pyautogui.write("token", interval=0.03)
-        token = get_region("model/token.png")
-        x, y = pyautogui.center(token)
-        pyautogui.moveTo(x + 735, y + 15)
-        pyautogui.doubleClick()
-        pyautogui.hotkey("ctrl", "c")
-        click("model/browser-close.png")
-        time.sleep(0.3)
-        pyautogui.hotkey("win", "m")
+    # 从控制台获取token
+    pyautogui.press('f12')
+    click("model/application.png")
+    click("model/filter.png")
+    pyautogui.write("token", interval=0.03)
+    token = get_region("model/token.png")
+    x, y = pyautogui.center(token)
+    pyautogui.moveTo(x + 735, y + 15)
+    pyautogui.doubleClick()
+    pyautogui.hotkey("ctrl", "c")
+    click("model/browser-close.png")
+    time.sleep(0.3)
+    pyautogui.hotkey("win", "m")
+
 
 
 def get_question():
@@ -330,8 +333,7 @@ def write_token(name):
 
 
 def test():
-    click("model/channal-message.png")
-    pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
-    click("model/tab-prompt.png")
-    pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
-    pyautogui.press("enter")
+    with open("url.txt", 'r') as f:
+        for line in f:
+            print(line)
+
