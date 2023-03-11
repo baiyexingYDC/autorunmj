@@ -13,30 +13,41 @@ from utils.imageUtils import resize_base64_image
 pytesseract.pytesseract.tesseract_cmd = r'D:\soft\tesseractocr\tesseract.exe'
 
 
+def pre_check():
+    shu = pyautogui.locateOnScreen("model/shurufa.png")
+    if shu:
+        pyautogui.press("shift")
+
+
 def click(model_path):
+    retry_count = 0
     browser = None  # 初始化一个变量 r
     while browser is None:  # 当 r 为 None 时，循环执行以下代码
-        try:  # 尝试执行以下代码
-            browser = pyautogui.locateOnScreen(model_path, confidence=0.8)  # 使用 locateOnScreen() 函数找到模板图片的位置，并赋值给 r
+        time.sleep(0.5)
+        browser = pyautogui.locateOnScreen(model_path, confidence=0.8)  # 使用 locateOnScreen() 函数找到模板图片的位置，并赋值给 r
+        if browser is not None:
             x, y = pyautogui.center(browser)
-            pyautogui.moveTo(x, y, duration=0.3)
+            pyautogui.moveTo(x, y, duration=0.2)
             # pyautogui.moveTo(x, y, duration=0.3, tween=pyautogui.easeOutQuad)
             pyautogui.click()
-            time.sleep(0.5)
             logger.debug(f"模板{model_path}的位置{browser}")  # 打印 r 的值
-        except Exception as e:  # 如果发生异常，执行以下代码
-            browser = None  # 将 r 设为 None，继续循环
+        retry_count += 1
+        if retry_count == 120:
+            logger.error(f"模板{model_path}点击超时.......")
+            raise Exception(f"模板{model_path}点击超时.......")
 
 
 def get_region(model_path):
+    retry_count = 0
     browser = None  # 初始化一个变量 r
     while browser is None:  # 当 r 为 None 时，循环执行以下代码
-        try:  # 尝试执行以下代码
-            browser = pyautogui.locateOnScreen(model_path, confidence=0.8)  # 使用 locateOnScreen() 函数找到模板图片的位置，并赋值给 r
-            time.sleep(0.5)
-        except Exception as e:  # 如果发生异常，执行以下代码
-            browser = None  # 将 r 设为 None，继续循环
-    return browser
+        time.sleep(0.5)
+        browser = pyautogui.locateOnScreen(model_path, confidence=0.8)  # 使用 locateOnScreen() 函数找到模板图片的位置，并赋值给 r
+        if browser is not None:
+            return browser
+        if retry_count == 120:
+            logger.error(f"模板{model_path}位置获取超时.......")
+            raise Exception(f"模板{model_path}点击超时.......")
 
 
 def load_url(url):
@@ -54,11 +65,11 @@ def register(name):
     click("model/input.png")
     pyautogui.write(name, interval=0.06)
     click("model/continue.png")
+    # 点击我是人类
+    click("model/hCapcha.png")
 
 
 def solv_hCapcha():
-    # 点击我是人类
-    click("model/hCapcha.png")
     # 获取问题
     question = get_question()
     # 获取图片并返回base64集合
@@ -92,40 +103,76 @@ def solv_hCapcha():
     click("model/check.png")
 
     retry = None
-    retry_count = 0
 
+    retry_count = 0
     # 判断是否需要再试一次
-    # while retry is None:  # 当 r 为 None 时，循环执行以下代码
-    #     try:  # 尝试执行以下代码
-    #         retry = pyautogui.locateOnScreen("model/try-again.png", confidence=0.8)
-    #         retry_count += 1
-    #         if retry_count == 4:
-    #             retry = "done"
-    #         time.sleep(0.5)
-    #     except Exception as e:  # 如果发生异常，执行以下代码
-    #         retry = None  # 将 r 设为 None，继续循环
+    while retry is None:  # 当 r 为 None 时，循环执行以下代码
+        time.sleep(0.5)
+        retry = pyautogui.locateOnScreen("model/try-again.png", confidence=0.8)
+        if retry is not None:
+            time.sleep(1.5)
+            logger.debug(f"挑战重新进行识别......")
+            solv_hCapcha()
+        retry_count += 1
+        if retry_count == 5:
+            logger.debug(f"挑战未找到需要重试！")
+            break
+        retry = None  # 将 r 设为 None，继续循环
 
 
 def get_token():
-    tokenText = ""
     success = get_region("model/success.png")
+    time.sleep(1)
     if success:
+        # 输入年月日
+        click("model/check-year.png")
+        pyautogui.write("199" + str(random.randint(1, 9)))
+
+        month = get_region("model/check-month.png")
+        click("model/check-month.png")
+        pyautogui.write(str(random.randint(1, 12)))
+        pyautogui.moveTo(month[0] + 80, month[1] - 20, duration=0.1, tween=pyautogui.easeOutQuad)
+        pyautogui.click()
+
+        click("model/check-day.png")
+        pyautogui.write(str(random.randint(1, 20)))
+        click("model/check-done.png")
+
+        # 关闭认证邮箱
+        success_email = get_region("model/success-email.png")
+        pyautogui.moveTo(success_email[0] - 100, success_email[1])
+        pyautogui.click()
+
+        # 输入prompt 并接受协议
+        click("model/channal-message.png")
+        pyautogui.write("/imagine", interval=random.uniform(0.07, 0.1))
+        time.sleep(0.4)
+        pyautogui.write(" ")
+        time.sleep(0.5)
+        pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
+        pyautogui.press("enter")
+        click("model/channal-accept toS.png")
+
+        # 从控制台获取token
         pyautogui.press('f12')
         click("model/application.png")
         click("model/filter.png")
         pyautogui.write("token", interval=0.03)
         token = get_region("model/token.png")
         x, y = pyautogui.center(token)
-        pyautogui.moveTo(x + 430, y + 15)
+        pyautogui.moveTo(x + 735, y + 15)
         pyautogui.doubleClick()
         pyautogui.hotkey("ctrl", "c")
+        click("model/browser-close.png")
+        time.sleep(0.3)
+        pyautogui.hotkey("win", "m")
 
 
 def get_question():
     region = get_region("model/click-every.png")
-    pyautogui.moveTo(region[0], region[1], duration=0.4, tween=pyautogui.easeOutQuad)
+    pyautogui.moveTo(region[0], region[1], duration=0.2, tween=pyautogui.easeOutQuad)
     # 文本识别
-    im = pyautogui.screenshot('temp/question.png', region=(region[0], region[1], 355, 55))
+    im = pyautogui.screenshot('temp/question.png', region=(region[0], region[1], 411, 55))
     text = pytesseract.image_to_string(im, lang='chi_sim')
     text = re.sub("\s+", "", text)
     logger.debug(f"识别文本:{text}")
@@ -163,23 +210,33 @@ def click_img(result):
         for j in range(3):
             x1 = x + j * 194  # 计算每一列的x坐标
             if count in result:
-                pyautogui.moveTo(x1 + 60, y1 + 60, duration=0.4, tween=pyautogui.easeOutQuad)
+                pyautogui.moveTo(x1 + 60, y1 + 60, duration=0.2, tween=pyautogui.easeOutQuad)
                 pyautogui.click()
             count += 1
 
 
-def write_token():
+def write_token(name):
+    pyautogui.PAUSE = 0.1
     click("model/wps_ico.png")
-    excelFlag = get_region("model/excel_flag.png")
-    pyautogui.moveTo(excelFlag)
-    pyautogui.rightClick()
-    click("model/paste.png")
+
+    excel_name = get_region("model/excel_name.png")
+    pyautogui.moveTo(excel_name)
+    pyautogui.click()
+    pyautogui.press("f2")
+    pyautogui.hotkey("ctrl", "a")
+    pyautogui.write(name)
+
+    excel_token = get_region("model/excel_token.png")
+    pyautogui.moveTo(excel_token)
+    pyautogui.click()
+    pyautogui.press("f2")
+    pyautogui.hotkey("ctrl", "a")
+    pyautogui.hotkey("ctrl", "v")
+    # pyautogui.rightClick()
+    # click("model/paste.png")
+    pyautogui.hotkey("alt", "esc")
 
 
 def test():
-    # pyautogui.write("token", interval=0.03)
-    token = get_region("model/token.png")
-    x, y = pyautogui.center(token)
-    pyautogui.moveTo(x + 430, y + 15)
-    pyautogui.doubleClick()
-    pyautogui.hotkey("ctrl", "c")
+    time.sleep(5)
+    pyautogui.hotkey("win", "m")
