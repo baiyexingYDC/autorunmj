@@ -7,6 +7,7 @@ from loguru import logger
 
 import pyautogui
 
+from solusion.guiOperate.VerifyExcept import VerifyExcept
 from utils.CaptchaResolver import CaptchaResolver
 from utils.imageUtils import resize_base64_image
 
@@ -151,7 +152,11 @@ def check_verify(hCapcha_retry_time):
                 raise Exception("重试验证次数达到上限！...")
         elif check is not None:
             logger.debug("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
+            click("model/browser-close.png")
+            time.sleep(0.3)
+            pyautogui.hotkey("win", "m")
             change_vpn()
+            raise VerifyExcept("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
         retry_count += 1
         if retry_count == 5:
             logger.debug(f"验证通过！")
@@ -222,12 +227,8 @@ def get_token():
 
         # 输入prompt 并接受协议
         click("model/channal-message.png")
-        pyautogui.write("/", interval=random.uniform(0.07, 0.1))
-        time.sleep(0.4)
-        pyautogui.write("imagine", interval=random.uniform(0.1, 0.12))
-        time.sleep(0.3)
-        pyautogui.press("tab")
-        time.sleep(0.5)
+        pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
+        click("model/tab-prompt.png")
         pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
         pyautogui.press("enter")
         click("model/channal-accept toS.png")
@@ -329,5 +330,8 @@ def write_token(name):
 
 
 def test():
-    time.sleep(5)
-    pyautogui.hotkey("win", "m")
+    click("model/channal-message.png")
+    pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
+    click("model/tab-prompt.png")
+    pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
+    pyautogui.press("enter")

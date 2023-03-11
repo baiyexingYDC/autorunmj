@@ -1,3 +1,7 @@
 .idea
 venv
 img
+**/*.log
+**/temp/*
+**/resize/*
+**/error_screenshot/*
