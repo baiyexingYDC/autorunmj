@@ -1,4 +1,5 @@
 import random
+import string
 import time
 from loguru import logger
 import pyautogui
@@ -18,14 +19,18 @@ logger.add(log_filename)
 # 定义一个变量来控制循环
 running = True
 
-count = 7
+count = 1
+
+tail = random.randint(1, 999999)
 
 # 使用try-except语句来捕获键盘中断异常
 try:
     # 当running为True时，循环执行函数
     while running:
-        invite_url = "https://discord.gg/arPcQVA7JV"
-        name = "say-girl-" + str(count)
+        invite_url = "https://discord.gg/8addhDS9r3"
+        num_letters = random.randint(4, 10)
+        name_pre = ''.join(random.choice(string.ascii_letters) for _ in range(num_letters))
+        name = name_pre + str(tail)
         logger.debug(f"邀请链接={invite_url}，用户名={name}")
 
         #配置
@@ -37,14 +42,14 @@ try:
         GuiOperate.open_inprivate()
         GuiOperate.load_url(invite_url)
         GuiOperate.register(name)
-        GuiOperate.solv_hCapcha()
+        GuiOperate.solv_hCapcha(1)
         GuiOperate.get_token()
         GuiOperate.write_token(name)
 
-        if count == 10:
+        if tail == 1:
             break
-        count += 1
-        time.sleep(120)
+        tail += 1
+        time.sleep(130)
 except KeyboardInterrupt:
     # 当按下ctrl+c时，设置running为False并退出循环
     running = False
