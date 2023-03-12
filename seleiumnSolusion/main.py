@@ -1,7 +1,6 @@
 import time
-import subprocess
 
-from solusion.seleiumnSolusion import discardOperate
+from seleiumnSolusion import discardOperate
 
 # 定义一个变量来控制循环
 running = True

@@ -5,15 +5,15 @@ from loguru import logger
 import pyautogui
 from datetime import datetime
 
-from solusion.guiOperate import GuiOperate
-from solusion.guiOperate.RateLimitedExcept import RateLimitedExcept
-from solusion.guiOperate.VerifyExcept import VerifyExcept
+import GuiOperate
+from RateLimitedExcept import RateLimitedExcept
+from VerifyExcept import VerifyExcept
 
 # 获取当前日期
 current_date = datetime.now().strftime('%Y-%m-%d')
 
 # 拼接日志文件名称
-log_filename = f'file_{current_date}.log'
+log_filename = f'log/file_{current_date}.log'
 
 # 添加日志处理器
 logger.add(log_filename)

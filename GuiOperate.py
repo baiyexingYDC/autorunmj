@@ -8,8 +8,8 @@ from loguru import logger
 
 import pyautogui
 
-from solusion.guiOperate.RateLimitedExcept import RateLimitedExcept
-from solusion.guiOperate.VerifyExcept import VerifyExcept
+from RateLimitedExcept import RateLimitedExcept
+from VerifyExcept import VerifyExcept
 from utils.CaptchaResolver import CaptchaResolver
 from utils.imageUtils import resize_base64_image
 
