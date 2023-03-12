@@ -21,7 +21,7 @@ logger.add(log_filename)
 # 定义一个变量来控制循环
 running = True
 
-batch = 10
+batch = 5
 
 tail = random.randint(1, 999999)
 

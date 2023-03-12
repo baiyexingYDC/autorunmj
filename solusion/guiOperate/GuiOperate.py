@@ -141,10 +141,15 @@ def check_verify(hCapcha_retry_time):
         success = pyautogui.locateOnScreen("model/browser/success.png", confidence=0.8)
         re_email = pyautogui.locateOnScreen("model/browser/success-email.png", confidence=0.8)
         rare_limit = pyautogui.locateOnScreen("model/browser/rare-limit.png", confidence=0.9)
+        conti = pyautogui.locateOnScreen("model/browser/continue.png", confidence=0.8)
         if try_again is not None:
             time.sleep(1.5)
             logger.debug(f"挑战重新进行识别......")
             solv_hCapcha(hCapcha_retry_time)
+        if conti is not None:
+            logger.debug("验证结束，回到了登录页，结束本次任务......")
+            close_browser()
+            raise VerifyExcept("验证结束，回到了登录页，结束本次任务......")
         elif hCapcha is not None:
             if hCapcha_retry_time <= 3:
                 x, y = pyautogui.center(hCapcha)
@@ -159,14 +164,14 @@ def check_verify(hCapcha_retry_time):
                 logger.debug("重试验证次数达到上限！...")
                 raise Exception("重试验证次数达到上限！...")
         elif check is not None:
-            logger.debug("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
+            logger.debug("触发风控！切换vpn节点并结束本次任务......")
             close_browser()
             change_vpn()
-            raise VerifyExcept("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
+            raise VerifyExcept("触发风控！切换vpn节点并结束本次任务......")
         elif rare_limit is not None:
-            logger.debug("触发风控！关闭浏览器跳过本次任务。。。。。。。。。。")
+            logger.debug("触发风控！关闭浏览器跳过本次任务......")
             close_browser()
-            raise RateLimitedExcept("触发风控！关闭浏览器跳过本次任务。。。。。。。。。。")
+            raise RateLimitedExcept("触发风控！关闭浏览器跳过本次任务......")
         elif success is not None:
             logger.debug("验证通过,生日快乐！")
             break
