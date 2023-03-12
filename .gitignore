@@ -4,3 +4,4 @@ img
 **/*.log
 **/temp/*
 **/resize/*
+**/error_screenshot/*
