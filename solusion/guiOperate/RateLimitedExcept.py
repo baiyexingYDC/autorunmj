@@ -1,0 +1,2 @@
+class RateLimitedExcept(Exception):
+    pass

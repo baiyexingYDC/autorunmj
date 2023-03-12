@@ -8,6 +8,7 @@ from loguru import logger
 
 import pyautogui
 
+from solusion.guiOperate.RateLimitedExcept import RateLimitedExcept
 from solusion.guiOperate.VerifyExcept import VerifyExcept
 from utils.CaptchaResolver import CaptchaResolver
 from utils.imageUtils import resize_base64_image
@@ -91,7 +92,7 @@ def get_region(model_path):
 
 
 def load_url(url):
-    click("model/browser-search.png")
+    click("model/browser/browser-search.png")
     pyautogui.write(url, interval=0.03)
     pyautogui.click()
     pyautogui.press("enter")
@@ -102,11 +103,11 @@ def open_inprivate():
 
 
 def register(name):
-    click("model/input.png")
+    click("model/browser/input.png")
     pyautogui.write(name, interval=0.06)
-    click("model/continue.png")
+    click("model/browser/continue.png")
     # 点击我是人类
-    random_click("model/hCapcha.png", random.randint(-60, 60), random.randint(-25, 25))
+    random_click("model/browser/hCapcha.png", random.randint(-60, 60), random.randint(-25, 25))
 
 def check_verify(hCapcha_retry_time):
     retry = None
@@ -115,10 +116,10 @@ def check_verify(hCapcha_retry_time):
     # 判断是否需要下一个
     while retry is None:  # 当 r 为 None 时，循环执行以下代码
         time.sleep(0.5)
-        retry = pyautogui.locateOnScreen("model/check-next.png", confidence=1)
+        retry = pyautogui.locateOnScreen("model/browser/check-next.png", confidence=1)
         if retry is not None:
             logger.debug(f"挑战重新进行下一个......")
-            click("model/check-next.png")
+            click("model/browser/check-next.png")
             solv_hCapcha(hCapcha_retry_time)
         retry_count += 1
         if retry_count == 2:
@@ -126,17 +127,20 @@ def check_verify(hCapcha_retry_time):
             break
         retry = None  # 将 r 设为 None，继续循环
 
-    click("model/check.png")
+    click("model/browser/check.png")
 
     retry_count = 0
     # 判断是否需要再试一次
     while True:  # 当 r 为 None 时，循环执行以下代码
         time.sleep(0.5)
         logger.debug(f"循环检测第{retry_count}次")
-        try_again = pyautogui.locateOnScreen("model/try-again.png", confidence=0.8)
-        hCapcha = pyautogui.locateOnScreen("model/hCapcha.png", confidence=0.8)
+        try_again = pyautogui.locateOnScreen("model/browser/try-again.png", confidence=0.9)
+        # check_skip = pyautogui.locateOnScreen("model/browser/check-skip.png", confidence=0.9)
+        hCapcha = pyautogui.locateOnScreen("model/browser/hCapcha.png", confidence=0.8)
         check = pyautogui.locateOnScreen("model/check/phone.png", confidence=0.8)
-        success = pyautogui.locateOnScreen("model/success.png", confidence=0.8)
+        success = pyautogui.locateOnScreen("model/browser/success.png", confidence=0.8)
+        re_email = pyautogui.locateOnScreen("model/browser/success-email.png", confidence=0.8)
+        rare_limit = pyautogui.locateOnScreen("model/browser/rare-limit.png", confidence=0.9)
         if try_again is not None:
             time.sleep(1.5)
             logger.debug(f"挑战重新进行识别......")
@@ -149,22 +153,33 @@ def check_verify(hCapcha_retry_time):
                 pyautogui.click()
                 retry_count += 1
                 logger.debug(f"验证不通过，重新识别")  # 打印 r 的值
-                click("model/hCapcha.png")
+                click("model/browser/hCapcha.png")
                 solv_hCapcha(hCapcha_retry_time)
             else:
                 logger.debug("重试验证次数达到上限！...")
                 raise Exception("重试验证次数达到上限！...")
         elif check is not None:
             logger.debug("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
-            click("model/browser-close.png")
-            time.sleep(0.3)
-            pyautogui.hotkey("win", "m")
+            close_browser()
             change_vpn()
             raise VerifyExcept("触发风控！切换vpn节点并结束本次任务。。。。。。。。。。")
+        elif rare_limit is not None:
+            logger.debug("触发风控！关闭浏览器跳过本次任务。。。。。。。。。。")
+            close_browser()
+            raise RateLimitedExcept("触发风控！关闭浏览器跳过本次任务。。。。。。。。。。")
         elif success is not None:
             logger.debug("验证通过,生日快乐！")
             break
+        elif re_email is not None:
+            logger.debug("验证通过,认证邮箱")
+            break
         retry_count += 1
+
+
+def close_browser():
+    click("model/browser/browser-close.png")
+    time.sleep(0.3)
+    pyautogui.hotkey("win", "m")
 
 
 def change_vpn():
@@ -191,14 +206,20 @@ def solv_hCapcha(hCapcha_retry_time):
         'solution', {}).get('objects')
 
     if not recognized_results:
+        # 文本识别错误 点击跳过
+        pyautogui.screenshot(f"error_screenshot/not-recognized-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}.png")
+        click("model/browser/check-skip.png")
+        solv_hCapcha(hCapcha_retry_time)
         logger.error('count not get captcha recognized indices')
-        return
 
     logger.debug(recognized_results)
 
     recognized_indices = [i for i, x in enumerate(recognized_results) if x]
 
     logger.debug(recognized_indices)
+    if len(recognized_indices) == 0:
+        click("model/browser/check-skip.png")
+        solv_hCapcha(hCapcha_retry_time)
 
     # 选中识别后的图片
     click_img(recognized_indices)
@@ -208,51 +229,51 @@ def solv_hCapcha(hCapcha_retry_time):
 
 
 def get_token():
-    # 输入年月日
-    click("model/check-year.png")
-    pyautogui.write("199" + str(random.randint(1, 9)))
+    success = pyautogui.locateOnScreen("model/browser/success.png", confidence=0.8)
+    # re_email = pyautogui.locateOnScreen("model/browser/success-email.png", confidence=0.8)
+    if success:
+        # 输入年月日
+        click("model/browser/check-year.png")
+        pyautogui.write("199" + str(random.randint(1, 9)))
 
-    month = get_region("model/check-month.png")
-    click("model/check-month.png")
-    pyautogui.write(str(random.randint(1, 12)))
-    pyautogui.moveTo(month[0] + 80, month[1] - 20, duration=0.1, tween=pyautogui.easeOutQuad)
-    pyautogui.click()
+        month = get_region("model/browser/check-month.png")
+        click("model/browser/check-month.png")
+        pyautogui.write(str(random.randint(1, 12)))
+        pyautogui.moveTo(month[0] + 80, month[1] - 20, duration=0.1, tween=pyautogui.easeOutQuad)
+        pyautogui.click()
 
-    click("model/check-day.png")
-    pyautogui.write(str(random.randint(1, 20)))
-    click("model/check-done.png")
+        click("model/browser/check-day.png")
+        pyautogui.write(str(random.randint(1, 20)))
+        click("model/browser/check-done.png")
 
-    # 关闭认证邮箱
-    success_email = get_region("model/success-email.png")
+    success_email = get_region("model/browser/success-email.png")
     pyautogui.moveTo(success_email[0] - 100, success_email[1])
     pyautogui.click()
 
     # 输入prompt 并接受协议
-    click("model/channal-message.png")
+    click("model/browser/channal-message.png")
     pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
-    click("model/tab-prompt.png")
+    click("model/browser/tab-prompt.png")
     pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
     pyautogui.press("enter")
-    click("model/channal-accept toS.png")
+    click("model/browser/channal-accept toS.png")
 
     # 从控制台获取token
     pyautogui.press('f12')
-    click("model/application.png")
-    click("model/filter.png")
+    click("model/browser/application.png")
+    click("model/browser/filter.png")
     pyautogui.write("token", interval=0.03)
-    token = get_region("model/token.png")
+    token = get_region("model/browser/token.png")
     x, y = pyautogui.center(token)
     pyautogui.moveTo(x + 735, y + 15)
     pyautogui.doubleClick()
     pyautogui.hotkey("ctrl", "c")
-    click("model/browser-close.png")
-    time.sleep(0.3)
-    pyautogui.hotkey("win", "m")
+    close_browser()
 
 
 
 def get_question():
-    region = get_region("model/click-every.png")
+    region = get_region("model/browser/click-every.png")
     # pyautogui.moveTo(region[0], region[1], duration=0.2, tween=pyautogui.easeOutQuad)
     # 文本识别
     im = pyautogui.screenshot('temp/question.png', region=(region[0], region[1], 411, 85))
@@ -263,13 +284,13 @@ def get_question():
 
 
 def get_img_base64():
-    region = get_region("model/click-every.png")
+    region = get_region("model/browser/click-every.png")
     x, y = region[0], region[1]
     time.sleep(1.5)
     count = 0
     while True:
         time.sleep(0.5)
-        l = pyautogui.locateOnScreen("model/hCapcha-loading.png", confidence=0.6)
+        l = pyautogui.locateOnScreen("model/browser/hCapcha-loading.png", confidence=0.6)
         if l is None or count == 20:
             logger.debug("验证码加载完毕!")
             break
@@ -293,7 +314,7 @@ def get_img_base64():
 
 
 def click_img(result):
-    region = get_region("model/click-every.png")
+    region = get_region("model/browser/click-every.png")
     x, y = region[0], region[1]
     count = 0  # 增加一个变量来记录循环的次数
     # 使用循环遍历每一行和每一列的图像
@@ -333,7 +354,9 @@ def write_token(name):
 
 
 def test():
-    with open("url.txt", 'r') as f:
-        for line in f:
-            print(line)
+    im = pyautogui.screenshot('temp/question.png', region=(1452, 797, 411, 85))
+    text = pytesseract.image_to_string(im, lang='chi_sim')
+    text = re.sub("\s+", "", text)
+    logger.debug(f"识别文本:{text}")
+
 

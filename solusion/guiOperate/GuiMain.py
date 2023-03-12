@@ -6,6 +6,7 @@ import pyautogui
 from datetime import datetime
 
 from solusion.guiOperate import GuiOperate
+from solusion.guiOperate.RateLimitedExcept import RateLimitedExcept
 from solusion.guiOperate.VerifyExcept import VerifyExcept
 
 # 获取当前日期
@@ -19,8 +20,6 @@ logger.add(log_filename)
 
 # 定义一个变量来控制循环
 running = True
-
-count = 1
 
 batch = 10
 
@@ -36,7 +35,9 @@ try:
     with open("url.txt", 'r') as f:
         for line in f:
             invite_url = line.strip()
-            for i in range(batch):
+            count = 0
+            while running:
+                count += 1
                 try:
                     num_letters = random.randint(4, 10)
                     name_pre = ''.join(random.choice(string.ascii_letters) for _ in range(num_letters))
@@ -48,16 +49,18 @@ try:
                     pyautogui.FAILSAFE = True
                     GuiOperate.pre_check()
                     # 录入用户名，破解验证
-                    GuiOperate.click("model/browser.png")
+                    GuiOperate.click("model/browser/browser.png")
                     GuiOperate.open_inprivate()
                     GuiOperate.load_url(invite_url)
                     GuiOperate.register(name)
                     GuiOperate.solv_hCapcha(1)
                     GuiOperate.get_token()
                     GuiOperate.write_token(name)
-
                     time.sleep(run_inv)
+                    if count == batch:
+                        break
                 except VerifyExcept as e:
+                    count -= 1
                     screenName = f"{name}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
                     logger.error(f"错误截图名称:{screenName}")
                     pyautogui.screenshot(f"error_screenshot/{screenName}.png")
@@ -65,6 +68,28 @@ try:
                     logger.debug("验证异常")
                     time.sleep(run_inv)
                     continue
+                except RateLimitedExcept as e:
+                    count -= 1
+                    screenName = f"{name}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+                    logger.error(f"错误截图名称:{screenName}")
+                    pyautogui.screenshot(f"error_screenshot/{screenName}.png")
+                    logger.error(e)
+                    logger.debug("访问受限!")
+                    time.sleep(run_inv)
+                    continue
+                except Exception as e:
+                    logger.error(e)
+                    if "browser" in str(e):
+                        count -= 1
+                        screenName = f"{name}-{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+                        logger.error(f"错误截图名称:{screenName}")
+                        pyautogui.screenshot(f"error_screenshot/{screenName}.png")
+                        logger.error("关闭浏览器窗口并继续")
+                        GuiOperate.close_browser()
+                        time.sleep(run_inv)
+                        continue
+                    else:
+                        raise e
 except KeyboardInterrupt:
     # 当按下ctrl+c时，设置running为False并退出循环
     logger.debug("程序手动停止")
@@ -74,3 +99,4 @@ except Exception as e:
     logger.error(f"错误截图名称:{screenName}")
     pyautogui.screenshot(f"error_screenshot/{screenName}.png")
     logger.error("程序异常停止!")
+
