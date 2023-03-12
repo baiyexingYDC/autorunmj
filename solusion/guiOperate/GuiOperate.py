@@ -350,6 +350,7 @@ def write_token(name):
     pyautogui.press("f2")
     pyautogui.hotkey("ctrl", "a")
     pyautogui.hotkey("ctrl", "v")
+    pyautogui.scroll(-20)
     pyautogui.hotkey("ctrl", "s")
     click("model/excel-close.png")
     # pyautogui.rightClick()
@@ -364,4 +365,4 @@ def test():
     text = re.sub("\s+", "", text)
     logger.debug(f"识别文本:{text}")
 
-
+write_token("aaa")
