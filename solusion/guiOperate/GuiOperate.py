@@ -364,5 +364,3 @@ def test():
     text = pytesseract.image_to_string(im, lang='chi_sim')
     text = re.sub("\s+", "", text)
     logger.debug(f"识别文本:{text}")
-
-write_token("aaa")
