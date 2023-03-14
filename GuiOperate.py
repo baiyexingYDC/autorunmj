@@ -146,6 +146,7 @@ def check_verify(hCapcha_retry_time):
             time.sleep(1.5)
             logger.debug(f"挑战重新进行识别......")
             solv_hCapcha(hCapcha_retry_time)
+            break
         elif conti is not None:
             logger.debug("验证结束，回到了登录页，结束本次任务......")
             close_browser()
@@ -160,6 +161,7 @@ def check_verify(hCapcha_retry_time):
                 logger.debug(f"验证不通过，重新识别")  # 打印 r 的值
                 click("model/browser/hCapcha.png")
                 solv_hCapcha(hCapcha_retry_time)
+                break
             else:
                 logger.debug("重试验证次数达到上限！...")
                 raise Exception("重试验证次数达到上限！...")
