@@ -121,6 +121,7 @@ def check_verify(hCapcha_retry_time):
             logger.debug(f"挑战重新进行下一个......")
             click("model/browser/check-next.png")
             solv_hCapcha(hCapcha_retry_time)
+            return
         retry_count += 1
         if retry_count == 2:
             logger.debug(f"挑战未找到下一个验证！")
@@ -218,20 +219,22 @@ def solv_hCapcha(hCapcha_retry_time):
         click("model/browser/check-skip.png")
         solv_hCapcha(hCapcha_retry_time)
         logger.error('count not get captcha recognized indices')
+    else:
+        logger.debug(recognized_results)
 
-    logger.debug(recognized_results)
+        recognized_indices = [i for i, x in enumerate(recognized_results) if x]
 
-    recognized_indices = [i for i, x in enumerate(recognized_results) if x]
+        logger.debug(recognized_indices)
+        if len(recognized_indices) == 0:
+            click("model/browser/check-skip.png")
+            solv_hCapcha(hCapcha_retry_time)
+        else:
+            # 选中识别后的图片
+            click_img(recognized_indices)
 
-    logger.debug(recognized_indices)
-    if len(recognized_indices) == 0:
-        click("model/browser/check-skip.png")
-        solv_hCapcha(hCapcha_retry_time)
+            check_verify(hCapcha_retry_time)
 
-    # 选中识别后的图片
-    click_img(recognized_indices)
 
-    check_verify(hCapcha_retry_time)
 
 
 
