@@ -146,7 +146,7 @@ def check_verify(hCapcha_retry_time):
             time.sleep(1.5)
             logger.debug(f"挑战重新进行识别......")
             solv_hCapcha(hCapcha_retry_time)
-        if conti is not None:
+        elif conti is not None:
             logger.debug("验证结束，回到了登录页，结束本次任务......")
             close_browser()
             raise VerifyExcept("验证结束，回到了登录页，结束本次任务......")
