@@ -201,7 +201,7 @@ def close_browser():
 def change_vpn():
     right_click(model_path + "/vpn_node/ico.png")
     move_to_screen(model_path + "/vpn_node/server-list.png")
-    random_click(model_path + "/vpn_node/vpn.png", 0, random.randint(-114, 114))
+    random_click(model_path + "/vpn_node/vpn.png", 0, random.randint(-318, 318))
 
 def solv_hCapcha(hCapcha_retry_time):
     # 获取问题
