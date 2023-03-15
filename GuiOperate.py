@@ -113,6 +113,8 @@ def open_inprivate():
 def register(name):
     click(model_path + "/browser/input.png")
     pyautogui.write(name, interval=0.06)
+    if get_region_now(model_path + "/browser/deal.png") is not None:
+        click(model_path + "/browser/deal.png")
     click(model_path + "/browser/continue.png")
     # 点击我是人类
     random_click(model_path + "/browser/hCapcha.png", random.randint(-60, 60), random.randint(-25, 25))
@@ -372,8 +374,8 @@ def write_token(name):
     # pyautogui.hotkey("alt", "esc")
 
 
-def test():
-    im = pyautogui.screenshot('temp/question.png', region=(1452, 797, 411, 85))
-    text = pytesseract.image_to_string(im, lang='chi_sim')
-    text = re.sub("\s+", "", text)
-    logger.debug(f"识别文本:{text}")
+# def test():
+#     if get_region_now(model_path + "/browser/deal.png") is not None:
+#         click(model_path + "/browser/deal.png")
+#
+# test()
