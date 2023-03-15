@@ -1,19 +1,27 @@
 import random
 import string
 import time
+
+import pytesseract
 from loguru import logger
 import pyautogui
 from datetime import datetime
 
 import GuiOperate
+import settings
 from RateLimitedExcept import RateLimitedExcept
 from VerifyExcept import VerifyExcept
+
+CONFIG = settings.load_config()
+settings.create_dir()
+#ocr软件日志
+pytesseract.pytesseract.tesseract_cmd = r'' + CONFIG["tesseract_path"]
 
 # 获取当前日期
 current_date = datetime.now().strftime('%Y-%m-%d')
 
 # 拼接日志文件名称
-log_filename = f'log/file_{current_date}.log'
+log_filename = f'file_{current_date}.log'
 
 # 添加日志处理器
 logger.add(log_filename)
@@ -21,18 +29,25 @@ logger.add(log_filename)
 # 定义一个变量来控制循环
 running = True
 
-batch = 5
+batch = CONFIG["batch"]
 
 tail = random.randint(1, 999999)
 
-name = "default"
+name = CONFIG["name"]
 
-run_inv = 130
+run_inv = CONFIG["run_interval"]
+fail_interval = CONFIG["fail_interval"]
+verify_fail_interval = CONFIG["verify_fail_interval"]
+rate_limited_interval = CONFIG["rate_limited_interval"]
+
+model_path = CONFIG["model_path"]
+
+url_list = "url.txt"
 
 # 使用try-except语句来捕获键盘中断异常
 try:
     # 当running为True时，循环执行函数
-    with open("url.txt", 'r') as f:
+    with open(url_list, 'r') as f:
         for line in f:
             invite_url = line.strip()
             count = 0
@@ -66,7 +81,7 @@ try:
                     pyautogui.screenshot(f"error_screenshot/{screenName}.png")
                     logger.error(e)
                     logger.debug("验证异常")
-                    time.sleep(run_inv)
+                    time.sleep(verify_fail_interval)
                     continue
                 except RateLimitedExcept as e:
                     count -= 1
@@ -75,7 +90,7 @@ try:
                     pyautogui.screenshot(f"error_screenshot/{screenName}.png")
                     logger.error(e)
                     logger.debug("访问受限!")
-                    time.sleep(run_inv)
+                    time.sleep(rate_limited_interval)
                     continue
                 except Exception as e:
                     logger.error(e)
@@ -86,7 +101,7 @@ try:
                         pyautogui.screenshot(f"error_screenshot/{screenName}.png")
                         logger.error("关闭浏览器窗口并继续")
                         GuiOperate.close_browser()
-                        time.sleep(run_inv)
+                        time.sleep(fail_interval)
                         continue
                     else:
                         raise e
