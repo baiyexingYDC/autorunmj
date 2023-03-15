@@ -124,7 +124,7 @@ def check_verify(hCapcha_retry_time):
     # 判断是否需要下一个
     while retry is None:  # 当 r 为 None 时，循环执行以下代码
         time.sleep(0.5)
-        retry = pyautogui.locateOnScreen(model_path + "/browser/check-next.png", confidence=0.9)
+        retry = pyautogui.locateOnScreen(model_path + "/browser/check-next.png", confidence=0.8)
         if retry is not None:
             logger.debug(f"挑战重新进行下一个......")
             click(model_path + "/browser/check-next.png")
