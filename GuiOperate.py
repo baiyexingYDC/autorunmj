@@ -37,7 +37,7 @@ def click(model_path):
             pyautogui.click()
             logger.debug(f"模板{model_path}的位置{browser}")  # 打印 r 的值
         retry_count += 1
-        if retry_count == 120:
+        if retry_count == 60:
             logger.error(f"模板{model_path}左击超时.......")
             raise Exception(f"模板{model_path}左击超时.......")
 
@@ -54,7 +54,7 @@ def right_click(model_path):
             pyautogui.rightClick()
             logger.debug(f"模板{model_path}的位置{browser}")  # 打印 r 的值
         retry_count += 1
-        if retry_count == 120:
+        if retry_count == 60:
             logger.error(f"模板{model_path}右击超时.......")
             raise Exception(f"模板{model_path}右击超时.......")
 
@@ -71,7 +71,7 @@ def random_click(model_path, random_x, random_y):
             pyautogui.click()
             logger.debug(f"模板{model_path}的位置{browser}")  # 打印 r 的值
         retry_count += 1
-        if retry_count == 120:
+        if retry_count == 60:
             logger.error(f"模板{model_path}点击超时.......")
             raise Exception(f"模板{model_path}点击超时.......")
 
@@ -88,9 +88,14 @@ def get_region(model_path):
         if browser is not None:
             return browser
         retry_count += 1
-        if retry_count == 120:
+        if retry_count == 60:
             logger.error(f"模板{model_path}位置获取超时.......")
             raise Exception(f"模板{model_path}点击超时.......")
+
+def get_region_now(model_path):
+    browser = pyautogui.locateOnScreen(model_path, confidence=0.8)  # 使用 locateOnScreen() 函数找到模板图片的位置，并赋值给 r
+    if browser is not None:
+        return browser
 
 
 def load_url(url):
@@ -98,6 +103,7 @@ def load_url(url):
     pyautogui.write(url, interval=0.03)
     pyautogui.click()
     pyautogui.press("enter")
+
 
 
 def open_inprivate():
@@ -118,7 +124,7 @@ def check_verify(hCapcha_retry_time):
     # 判断是否需要下一个
     while retry is None:  # 当 r 为 None 时，循环执行以下代码
         time.sleep(0.5)
-        retry = pyautogui.locateOnScreen(model_path + "/browser/check-next.png", confidence=1)
+        retry = pyautogui.locateOnScreen(model_path + "/browser/check-next.png", confidence=0.9)
         if retry is not None:
             logger.debug(f"挑战重新进行下一个......")
             click(model_path + "/browser/check-next.png")

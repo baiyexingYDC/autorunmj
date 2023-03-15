@@ -64,7 +64,7 @@ try:
                     pyautogui.FAILSAFE = True
                     GuiOperate.pre_check()
                     # 录入用户名，破解验证
-                    GuiOperate.click("model/browser/browser.png")
+                    GuiOperate.click(model_path + "/browser/browser.png")
                     GuiOperate.open_inprivate()
                     GuiOperate.load_url(invite_url)
                     GuiOperate.register(name)
@@ -101,6 +101,10 @@ try:
                         pyautogui.screenshot(f"error_screenshot/{screenName}.png")
                         logger.error("关闭浏览器窗口并继续")
                         GuiOperate.close_browser()
+                        if GuiOperate.get_region_now(model_path + "/browser/connect-error.png"):
+                            logger.error("网络链接异常！更换VPN并继续！")
+                            GuiOperate.close_browser()
+                            GuiOperate.change_vpn()
                         time.sleep(fail_interval)
                         continue
                     else:
