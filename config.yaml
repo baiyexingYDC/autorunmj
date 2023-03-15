@@ -9,11 +9,11 @@ dev:
   tesseract_path: "D:/soft/tesseractocr/tesseract.exe"
 
 prod:
-  batch: 10
+  batch: 20
   name: "default"
   run_interval: 130
   fail_interval: 130
   verify_fail_interval: 130
   rate_limited_interval: 130
   model_path: "model"
-  tesseract_path: "D:/soft/tesseractocr/tesseract.exe"
+  tesseract_path: "C:/dev/Tesseract-OCR/tesseract.exe"
