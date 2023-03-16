@@ -101,9 +101,12 @@ try:
                         pyautogui.screenshot(f"error_screenshot/{screenName}.png")
                         logger.error("关闭浏览器窗口并继续")
                         GuiOperate.close_browser()
+                        if "input.png" in str(e):
+                            logger.error("网络链接异常！更换VPN并继续！")
+                            GuiOperate.change_vpn()
+                            continue
                         if GuiOperate.get_region_now(model_path + "/browser/connect-error.png") is not None:
                             logger.error("网络链接异常！更换VPN并继续！")
-                            GuiOperate.close_browser()
                             GuiOperate.change_vpn()
                         time.sleep(fail_interval)
                         continue
