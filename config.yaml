@@ -7,6 +7,11 @@ dev:
   rate_limited_interval: 130
   model_path: "model-dev"
   tesseract_path: "D:/soft/tesseractocr/tesseract.exe"
+  db:
+    host: "192.168.73.129"
+    user: "root"
+    password: "mysql"
+    database: "autorunmj"
 
 prod:
   batch: 20
@@ -17,6 +22,11 @@ prod:
   rate_limited_interval: 130
   model_path: "model"
   tesseract_path: "C:/dev/Tesseract-OCR/tesseract.exe"
+  db:
+    host: "192.168.73.129"
+    user: "root"
+    password: "mysql"
+    database: "autorunmj"
 
 prod-1:
   batch: 20
@@ -27,3 +37,8 @@ prod-1:
   rate_limited_interval: 130
   model_path: "model-1"
   tesseract_path: "C:/dev/Tesseract-OCR/tesseract.exe"
+  db:
+    host: "192.168.73.129"
+    user: "root"
+    password: "mysql"
+    database: "autorunmj"

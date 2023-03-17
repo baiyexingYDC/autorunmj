@@ -15,7 +15,6 @@ from utils.CaptchaResolver import CaptchaResolver
 from utils.imageUtils import resize_base64_image
 
 CONFIG = settings.load_config()
-settings.create_dir()
 model_path = CONFIG["model_path"]
 
 def pre_check():
