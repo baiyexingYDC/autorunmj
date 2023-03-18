@@ -3,14 +3,16 @@ import time
 import random
 from datetime import datetime
 
+import pyperclip
 import pytesseract
+from PIL import ImageEnhance, ImageFilter
 from loguru import logger
 
 import pyautogui
 
 import settings
-from RateLimitedExcept import RateLimitedExcept
-from VerifyExcept import VerifyExcept
+from error.RateLimitedExcept import RateLimitedExcept
+from error.VerifyExcept import VerifyExcept
 from utils.CaptchaResolver import CaptchaResolver
 from utils.imageUtils import resize_base64_image
 
@@ -191,6 +193,8 @@ def check_verify(hCapcha_retry_time):
             logger.debug("验证通过,认证邮箱")
             break
         retry_count += 1
+        if retry_count > 200:
+            raise Exception("重复检测超时！")
 
 
 def close_browser():
@@ -289,6 +293,12 @@ def get_token():
     pyautogui.hotkey("ctrl", "c")
     close_browser()
 
+    # 获取复制板里的token
+    token = pyperclip.paste()
+    token = token.replace("\"", "")
+
+    return token
+
 
 
 def get_question():
@@ -376,5 +386,5 @@ def write_token(name):
 # def test():
 #     if get_region_now(model_path + "/browser/deal.png") is not None:
 #         click(model_path + "/browser/deal.png")
-#
-# test()
+# #
+# logger.debug(get_question())

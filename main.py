@@ -1,5 +1,6 @@
 import random
 import string
+import sys
 import time
 
 import pytesseract
@@ -7,10 +8,12 @@ from loguru import logger
 import pyautogui
 from datetime import datetime
 
+import DbOperate
 import GuiOperate
 import settings
-from RateLimitedExcept import RateLimitedExcept
-from VerifyExcept import VerifyExcept
+from error.DbExcept import DbExcept
+from error.RateLimitedExcept import RateLimitedExcept
+from error.VerifyExcept import VerifyExcept
 
 CONFIG = settings.load_config()
 settings.create_dir()
@@ -46,6 +49,10 @@ url_list = "url.txt"
 
 # 使用try-except语句来捕获键盘中断异常
 try:
+    #检查数据库链接
+    if not DbOperate.check_conn():
+        logger.error("数据库连接异常，退出程序！")
+        sys.exit()
     # 当running为True时，循环执行函数
     with open(url_list, 'r') as f:
         for line in f:
@@ -69,8 +76,13 @@ try:
                     GuiOperate.load_url(invite_url)
                     GuiOperate.register(name)
                     GuiOperate.solv_hCapcha(1)
-                    GuiOperate.get_token()
-                    GuiOperate.write_token(name)
+                    token = GuiOperate.get_token()
+                    logger.debug(f"获取token={token}")
+                    if "db" == CONFIG["write_token_to"]:
+                        logger.debug("写数据到数据库...")
+                        DbOperate.insert_token(name, token, invite_url)
+                    else:
+                        GuiOperate.write_token(name)
                     time.sleep(run_inv)
                     if count == batch:
                         break
@@ -92,6 +104,9 @@ try:
                     logger.debug("访问受限!")
                     time.sleep(rate_limited_interval)
                     continue
+                except DbExcept as e:
+                    logger.error("数据库操作异常，程序停止！")
+                    sys.exit()
                 except Exception as e:
                     logger.error(e)
                     if "browser" in str(e):

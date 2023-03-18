@@ -1,5 +1,5 @@
 dev:
-  batch: 10
+  batch: 5
   name: "default"
   run_interval: 130
   fail_interval: 130
@@ -7,14 +7,16 @@ dev:
   rate_limited_interval: 130
   model_path: "model-dev"
   tesseract_path: "D:/soft/tesseractocr/tesseract.exe"
+  # db or excel
+  write_token_to: "db"
   db:
-    host: "192.168.73.129"
+    host: "192.168.101.130"
     user: "root"
     password: "mysql"
     database: "autorunmj"
 
 prod:
-  batch: 20
+  batch: 30
   name: "default"
   run_interval: 130
   fail_interval: 110
@@ -22,23 +24,27 @@ prod:
   rate_limited_interval: 130
   model_path: "model"
   tesseract_path: "C:/dev/Tesseract-OCR/tesseract.exe"
+  # db or excel
+  write_token_to: "db"
   db:
-    host: "192.168.73.129"
+    host: "192.168.101.130"
     user: "root"
     password: "mysql"
     database: "autorunmj"
 
 prod-1:
-  batch: 20
+  batch: 30
   name: "default"
-  run_interval: 110
+  run_interval: 130
   fail_interval: 130
   verify_fail_interval: 130
   rate_limited_interval: 130
   model_path: "model-1"
   tesseract_path: "C:/dev/Tesseract-OCR/tesseract.exe"
+  # db or excel
+  write_token_to: "db"
   db:
-    host: "192.168.73.129"
+    host: "192.168.101.130"
     user: "root"
     password: "mysql"
     database: "autorunmj"
