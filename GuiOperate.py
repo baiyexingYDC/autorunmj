@@ -176,7 +176,7 @@ def check_verify(hCapcha_retry_time):
                 break
             else:
                 logger.debug("重试验证次数达到上限！...")
-                raise Exception("重试验证次数达到上限！...")
+                raise VerifyExcept("重试验证次数达到上限！...")
         elif check is not None:
             logger.debug("触发风控！切换vpn节点并结束本次任务......")
             close_browser()
@@ -194,7 +194,7 @@ def check_verify(hCapcha_retry_time):
             break
         retry_count += 1
         if retry_count > 200:
-            raise Exception("重复检测超时！")
+            raise VerifyExcept("重复检测超时！")
 
 
 def close_browser():
