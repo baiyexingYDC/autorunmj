@@ -10,6 +10,8 @@ dev:
   # db or excel
   write_token_to: "db"
   prompt_first: "no"
+  # jg 极光 v v2rayN
+  vpn: "jg"
   db:
     host: "192.168.101.130"
     user: "root"
@@ -28,6 +30,7 @@ prod:
   # db or excel
   write_token_to: "db"
   prompt_first: "yes"
+  vpn: "v"
   db:
     host: "192.168.101.130"
     user: "root"
@@ -46,6 +49,7 @@ prod-1:
   # db or excel
   write_token_to: "db"
   prompt_first: "yes"
+  vpn: "v"
   db:
     host: "192.168.101.130"
     user: "root"

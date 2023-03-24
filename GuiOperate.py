@@ -204,9 +204,43 @@ def close_browser():
 
 
 def change_vpn():
-    right_click(model_path + "/vpn_node/ico.png")
-    move_to_screen(model_path + "/vpn_node/server-list.png")
-    random_click(model_path + "/vpn_node/vpn.png", 0, random.randint(-221, 221))
+    if "v" == CONFIG["vpn"]:
+        right_click(model_path + "/vpn_node/ico.png")
+        move_to_screen(model_path + "/vpn_node/server-list.png")
+        random_click(model_path + "/vpn_node/vpn.png", 0, random.randint(-221, 221))
+    elif "jg" == CONFIG["vpn"]:
+        click(model_path + "/vpn_node_1/ico.png")
+        flag = get_region(model_path + "/vpn_node_1/flag.png")
+        x, y = pyautogui.center(flag)
+        pyautogui.moveTo(x, y + 656)
+        pyautogui.click()
+        listFlag = get_region(model_path + "/vpn_node_1/list-flag.png")
+        x, y = pyautogui.center(listFlag)
+        pyautogui.moveTo(x, y + random.randint(1, 12) * 72)
+        pyautogui.click()
+
+        count = 1
+        while True:
+            logger.debug(f"第{count}次切换vpn")
+            fail = get_region_now(model_path + "/vpn_node_1/link-fail.png")
+            success = get_region_now(model_path + "/vpn_node_1/link-success.png")
+            if fail is not None:
+                logger.error("vpn切换失败，重选选择")
+                change_vpn()
+            elif success is not None:
+                logger.debug("vpn切换成功！")
+                pyautogui.hotkey("alt", "esc")
+                break
+
+            if count == 40:
+                logger.error("重试vpn切换达到上限！")
+                raise Exception("vpn切换失败!")
+
+            count += 1
+
+
+
+
 
 def solv_hCapcha(hCapcha_retry_time):
     # 获取问题
@@ -384,8 +418,7 @@ def write_token(name):
     # pyautogui.hotkey("alt", "esc")
 
 
-# def test():
-#     if get_region_now(model_path + "/browser/deal.png") is not None:
-#         click(model_path + "/browser/deal.png")
-# #
-# logger.debug(get_question())
+def test():
+    change_vpn()
+
+test()
