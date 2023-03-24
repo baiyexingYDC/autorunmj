@@ -274,12 +274,13 @@ def get_token():
     pyautogui.click()
 
     # 输入prompt 并接受协议
-    click(model_path + "/browser/channal-message.png")
-    pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
-    click(model_path + "/browser/tab-prompt.png")
-    pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
-    pyautogui.press("enter")
-    click(model_path + "/browser/channal-accept toS.png")
+    if "yes" == CONFIG["prompt_first"]:
+        click(model_path + "/browser/channal-message.png")
+        pyautogui.write("/i", interval=random.uniform(0.07, 0.1))
+        click(model_path + "/browser/tab-prompt.png")
+        pyautogui.write("a cute girl", interval=random.uniform(0.07, 0.1))
+        pyautogui.press("enter")
+        click(model_path + "/browser/channal-accept toS.png")
 
     # 从控制台获取token
     pyautogui.press('f12')
