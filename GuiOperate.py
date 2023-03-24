@@ -340,8 +340,8 @@ def get_question():
     region = get_region(model_path + "/browser/click-every.png")
     # pyautogui.moveTo(region[0], region[1], duration=0.2, tween=pyautogui.easeOutQuad)
     # 文本识别
-    im = pyautogui.screenshot('temp/question.png', region=(region[0], region[1], 411, 85))
-    text = pytesseract.image_to_string(im, lang='chi_sim')
+    im = pyautogui.screenshot('temp/question.png', region=(region[0], region[1], 401, 95))
+    text = pytesseract.image_to_string(im, lang='chi_sim', config='--psm 6')
     text = re.sub("\s+", "", text)
     logger.debug(f"识别文本:{text}")
     return text
@@ -421,4 +421,4 @@ def write_token(name):
 def test():
     change_vpn()
 
-# test()
+get_question()
