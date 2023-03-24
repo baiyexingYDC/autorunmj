@@ -421,4 +421,4 @@ def write_token(name):
 def test():
     change_vpn()
 
-test()
+# test()
