@@ -229,7 +229,7 @@ def change_vpn():
                 change_vpn()
             elif success is not None:
                 logger.debug("vpn切换成功！")
-                pyautogui.hotkey("alt", "esc")
+                click(model_path + "/vpn_node_1/close.png")
                 break
 
             if count == 40:
@@ -421,4 +421,4 @@ def write_token(name):
 def test():
     change_vpn()
 
-# get_question()
+# test()

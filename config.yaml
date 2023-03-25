@@ -1,5 +1,5 @@
 dev:
-  batch: 200
+  batch: 100
   name: "default"
   run_interval: 150
   fail_interval: 150
