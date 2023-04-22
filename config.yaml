@@ -9,7 +9,7 @@ dev:
   tesseract_path: "D:/soft/tesseractocr/tesseract.exe"
   # db or excel
   write_token_to: "db"
-  prompt_first: "no"
+  prompt_first: "yes"
   # jg 极光 v v2rayN
   vpn: "jg"
   db:

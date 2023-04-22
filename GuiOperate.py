@@ -226,6 +226,7 @@ def change_vpn():
             success = get_region_now(model_path + "/vpn_node_1/link-success.png")
             if fail is not None:
                 logger.error("vpn切换失败，重选选择")
+                click(model_path + "/vpn_node_1/close.png")
                 change_vpn()
             elif success is not None:
                 logger.debug("vpn切换成功！")
